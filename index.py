@@ -3,6 +3,8 @@ import hashlib
 import re
 import pandas as pd
 import random
+import os
+from datetime import datetime
 
 def id_berikutnya(filename):
     try:
@@ -122,7 +124,7 @@ def show_menu(level, user_id):
         if pilihan == '0':
             show_profile(level, user_id)
         elif pilihan == '1':
-            hitung_menu()
+            hitung_menu(level, user_id)
         else:
             print("Pilihan tidak valid.")
             show_menu(level, user_id)
@@ -185,7 +187,7 @@ def show_profile(level, user_id):
     except Exception as e:
         print(f"Terjadi kesalahan: {e}")
 
-def hitung_menu():
+def hitung_menu(level, user_id):
     print("\n=== Hitung Menu ===")
     print("Ingin menginput menu secara:")
     print("[1] Manual")
@@ -194,13 +196,13 @@ def hitung_menu():
     pilihan = input("Pilih metode: ")
 
     if pilihan == "1":
-        hitung_manual()
+        hitung_manual(level, user_id)
     elif pilihan == "2":
-        hitung_otomatis()
+        hitung_otomatis(level, user_id)
     else:
         print("Pilihan tidak valid.")
         
-def hitung_manual():
+def hitung_manual(level, user_id):
     print("\n=== Mode Manual ===")
     print("Pilih tujuan konsumsi:")
     print("[1] Diet (maks 1000 kalori)")
@@ -226,7 +228,6 @@ def hitung_manual():
         print("❌ Pilihan tidak valid.")
         return
 
-    # Fungsi untuk input daftar makanan
     def input_manual_menu():
         print("\n=== Input Menu Manual ===")
         print("Masukkan daftar makanan dan jumlah kalorinya.")
@@ -246,18 +247,15 @@ def hitung_manual():
                 continue
 
             makanan_list.append({"makanan": makanan, "kalori": kalori})
-            
+
             lanjut = input("Ingin tambah makanan lagi? (y untuk lanjut, n untuk berhenti): ")
             if lanjut.lower() == 'n':
                 break
 
         return makanan_list
 
-
-    # Panggil input makanan dari user
     makanan_list = input_manual_menu()
 
-    # Hitung total kalori
     total_kalori = sum(item["kalori"] for item in makanan_list)
 
     print("\n📋 Daftar Makanan yang Dimasukkan:")
@@ -271,7 +269,45 @@ def hitung_manual():
     else:
         print("⚠️  Menu melebihi target kalori.")
 
-def hitung_otomatis():
+        # 🧠 Tambahkan solusi knapsack jika melebihi batas
+        n = len(makanan_list)
+        W = batas_kalori
+
+        # Buat tabel DP
+        dp = [[0] * (W + 1) for _ in range(n + 1)]
+
+        for i in range(1, n + 1):
+            kal = makanan_list[i - 1]['kalori']
+            for w in range(W + 1):
+                if kal <= w:
+                    dp[i][w] = max(dp[i - 1][w], dp[i - 1][w - kal] + kal)
+                else:
+                    dp[i][w] = dp[i - 1][w]
+
+        # Traceback untuk mencari item yang dipilih
+        w = W
+        selected_items = []
+        for i in range(n, 0, -1):
+            if dp[i][w] != dp[i - 1][w]:
+                selected_items.append(makanan_list[i - 1])
+                w -= makanan_list[i - 1]['kalori']
+
+        selected_items.reverse()
+
+        print("\n💡 Rekomendasi Menu Terbaik (Knapsack ≤ batas kalori):")
+        for item in selected_items:
+            print(f"- {item['makanan']} ({item['kalori']} kkal)")
+        print(f"\n✅ Total Kalori Optimal: {sum(item['kalori'] for item in selected_items)} kkal")
+        simpan = input("\n💾 Apakah ingin menyimpan hasil ke history? (y/n): ")
+        if simpan.lower() == 'y':
+            kebutuhan = "manual"
+            simpan_ke_history(user_id, makanan_list, kebutuhan)
+            print("✅ Disimpan ke history.csv")
+        else:
+            print("❌ Tidak disimpan.")
+        show_menu(level, user_id)
+    
+def hitung_otomatis(level, user_id):
     print("\n=== Mode Otomatis ===")
     print("Pilih tujuan konsumsi:")
     print("[1] Diet")
@@ -305,7 +341,6 @@ def hitung_otomatis():
     batas_kalori = batas[0]
     print(f"\nTarget Kalori Maksimum: {batas_kalori} kkal")
 
-    # Urutkan makanan berdasarkan kalori tertinggi terlebih dahulu
     menu_df_sorted = menu_df.sort_values(by='kalori', ascending=False)
 
     selected = []
@@ -313,7 +348,7 @@ def hitung_otomatis():
 
     for _, row in menu_df_sorted.iterrows():
         if total + row['kalori'] <= batas_kalori:
-            selected.append(row)
+            selected.append({"makanan": row['makanan'], "kalori": row['kalori']})
             total += row['kalori']
 
     print("\n📋 Menu Rekomendasi Berdasarkan Knapsack Greedy:")
@@ -322,6 +357,51 @@ def hitung_otomatis():
 
     print(f"\n✅ Total kalori: {total} / {batas_kalori}")
 
+    # Tawarkan simpan ke history
+    simpan = input("\n💾 Apakah ingin menyimpan hasil ke history? (y/n): ")
+    if simpan.lower() == 'y':
+        simpan_ke_history(user_id, selected, target)
+        print("✅ Disimpan ke history.csv")
+    else:
+        print("❌ Tidak disimpan.")
+
+def simpan_ke_history(user_id, makanan_list, kebutuhan):
+    import pandas as pd
+    import os
+    from datetime import datetime
+
+    if os.path.exists("history.csv"):
+        try:
+            data_df = pd.read_csv("history.csv")
+            # Pastikan kolom 'id' ada
+            if 'id' not in data_df.columns:
+                # Jika kolom 'id' tidak ada, beri nama kolom secara manual
+                data_df = pd.read_csv("history.csv", header=None)
+                data_df.columns = ["id", "user_id", "tanggal", "makanan dan kalori", "kebutuhan"]
+        except Exception as e:
+            print(f"Error membaca CSV: {e}")
+            data_df = pd.DataFrame(columns=["id", "user_id", "tanggal", "makanan dan kalori", "kebutuhan"])
+        data_id = data_df["id"].max() + 1 if not data_df.empty else 1
+    else:
+        data_df = pd.DataFrame(columns=["id", "user_id", "tanggal", "makanan dan kalori", "kebutuhan"])
+        data_id = 1
+
+    tanggal = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    makanan_str = ', '.join([f"{item['makanan']} ({item['kalori']})" for item in makanan_list])
+
+    data = {
+        "id": [data_id],
+        "user_id": [user_id],
+        "tanggal": [tanggal],
+        "makanan dan kalori": [makanan_str],
+        "kebutuhan": [kebutuhan]
+    }
+
+    df_baru = pd.DataFrame(data)
+
+    df_baru.to_csv("history.csv", mode='a', header=not os.path.exists("history.csv"), index=False)
+
+        
 # Jalankan program
 if __name__ == "__main__":
     main_menu()
