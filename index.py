@@ -2,6 +2,7 @@ import csv
 import hashlib
 import re
 import pandas as pd
+import random
 
 def id_berikutnya(filename):
     try:
@@ -103,25 +104,28 @@ def show_menu(level, user_id):
     print("[0] Profil")
 
     if level == "pengguna":
-        print("[1] Layanan A")
-        print("[2] Layanan B")
+        print("[1] Hitung Menu")
+        print("[2] Rekomendasi Menu")
+        print("[3] History Konsumsi")
+        print("[4] Rekomendasi Resep")
+        print("[5] Visualisasi Konsumsi Kalori")
     elif level == "admin":
-        print("[1] Laporan Sistem")
-        print("[2] Kelola Pengguna")
+        print("[1] Kelola Rekomendasi Menu")
+        print("[2] Kelola Rekomendasi Resep")
     else:
         print("Level tidak dikenali.")
         return
 
     pilihan = input("Pilih menu: ")
 
-    if pilihan == '0':
-        show_profile(level, user_id)
-    elif pilihan in ['1', '2']:
-        print("Fitur ini masih dalam pengembangan.")
-        show_menu(level, user_id)
-    else:
-        print("Pilihan tidak valid.")
-        show_menu(level, user_id)
+    if level == "pengguna":
+        if pilihan == '0':
+            show_profile(level, user_id)
+        elif pilihan == '1':
+            hitung_menu()
+        else:
+            print("Pilihan tidak valid.")
+            show_menu(level, user_id)
 
 def show_profile(level, user_id):
     try:
@@ -180,6 +184,143 @@ def show_profile(level, user_id):
 
     except Exception as e:
         print(f"Terjadi kesalahan: {e}")
+
+def hitung_menu():
+    print("\n=== Hitung Menu ===")
+    print("Ingin menginput menu secara:")
+    print("[1] Manual")
+    print("[2] Otomatis")
+
+    pilihan = input("Pilih metode: ")
+
+    if pilihan == "1":
+        hitung_manual()
+    elif pilihan == "2":
+        hitung_otomatis()
+    else:
+        print("Pilihan tidak valid.")
+        
+def hitung_manual():
+    print("\n=== Mode Manual ===")
+    print("Pilih tujuan konsumsi:")
+    print("[1] Diet (maks 1000 kalori)")
+    print("[2] Normal (maks 1800 kalori)")
+    print("[3] Bulking (maks 2500 kalori)")
+    print("[0] Input jumlah kalori manual")
+
+    pilihan = input("Pilihan: ")
+
+    if pilihan == "1":
+        batas_kalori = 1000
+    elif pilihan == "2":
+        batas_kalori = 1800
+    elif pilihan == "3":
+        batas_kalori = 2500
+    elif pilihan == "0":
+        try:
+            batas_kalori = int(input("Masukkan batas kalori manual: "))
+        except ValueError:
+            print("❌ Input tidak valid.")
+            return
+    else:
+        print("❌ Pilihan tidak valid.")
+        return
+
+    # Fungsi untuk input daftar makanan
+    def input_manual_menu():
+        print("\n=== Input Menu Manual ===")
+        print("Masukkan daftar makanan dan jumlah kalorinya.")
+        print("Ketik 'n' jika sudah selesai.\n")
+
+        makanan_list = []
+
+        while True:
+            makanan = input("Nama Makanan: ")
+            if makanan.lower() == 'n':
+                break
+
+            try:
+                kalori = int(input("Jumlah Kalori: "))
+            except ValueError:
+                print("❌ Kalori harus berupa angka!")
+                continue
+
+            makanan_list.append({"makanan": makanan, "kalori": kalori})
+            
+            lanjut = input("Ingin tambah makanan lagi? (y untuk lanjut, n untuk berhenti): ")
+            if lanjut.lower() == 'n':
+                break
+
+        return makanan_list
+
+
+    # Panggil input makanan dari user
+    makanan_list = input_manual_menu()
+
+    # Hitung total kalori
+    total_kalori = sum(item["kalori"] for item in makanan_list)
+
+    print("\n📋 Daftar Makanan yang Dimasukkan:")
+    for item in makanan_list:
+        print(f"- {item['makanan']} ({item['kalori']} kkal)")
+
+    print(f"\n✅ Total Kalori: {total_kalori} dari batas {batas_kalori} kkal")
+
+    if total_kalori <= batas_kalori:
+        print("✅ Menu sesuai dengan target kalori.")
+    else:
+        print("⚠️  Menu melebihi target kalori.")
+
+def hitung_otomatis():
+    print("\n=== Mode Otomatis ===")
+    print("Pilih tujuan konsumsi:")
+    print("[1] Diet")
+    print("[2] Normal")
+    print("[3] Bulking")
+
+    pilihan = input("Pilihan: ")
+
+    try:
+        kalori_df = pd.read_csv("kalori.csv")
+        menu_df = pd.read_csv("menu.csv")
+    except:
+        print("❌ Gagal membaca file kalori.csv atau menu.csv")
+        return
+
+    if pilihan == "1":
+        target = "diet"
+    elif pilihan == "2":
+        target = "normal"
+    elif pilihan == "3":
+        target = "bulking"
+    else:
+        print("Pilihan tidak valid.")
+        return
+
+    batas = kalori_df[kalori_df['jenis'] == target]['jumlah maks kalori'].values
+    if len(batas) == 0:
+        print("❌ Tidak ditemukan data kalori untuk kategori tersebut.")
+        return
+
+    batas_kalori = batas[0]
+    print(f"\nTarget Kalori Maksimum: {batas_kalori} kkal")
+
+    # Urutkan makanan berdasarkan kalori tertinggi terlebih dahulu
+    menu_df_sorted = menu_df.sort_values(by='kalori', ascending=False)
+
+    selected = []
+    total = 0
+
+    for _, row in menu_df_sorted.iterrows():
+        if total + row['kalori'] <= batas_kalori:
+            selected.append(row)
+            total += row['kalori']
+
+    print("\n📋 Menu Rekomendasi Berdasarkan Knapsack Greedy:")
+    for item in selected:
+        print(f"- {item['makanan']} ({item['kalori']} kkal)")
+
+    print(f"\n✅ Total kalori: {total} / {batas_kalori}")
 
 # Jalankan program
 if __name__ == "__main__":
