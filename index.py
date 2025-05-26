@@ -565,6 +565,7 @@ def visualisasi_konsumsi_kalori(level, user_id):
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.grid(axis='y', linestyle='--', alpha=0.7)
+        plt.savefig("grafik_kalori.png")
         plt.show()
 
     except FileNotFoundError:
@@ -572,7 +573,6 @@ def visualisasi_konsumsi_kalori(level, user_id):
     except Exception as e:
         print(f"❌ Terjadi kesalahan: {e}")
     
-    plt.savefig("grafik_kalori.png")
     show_menu(level, user_id)
     
 # Jalankan program
