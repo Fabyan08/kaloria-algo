@@ -136,6 +136,16 @@ def show_menu(level, user_id):
         else:
             print("Pilihan tidak valid.")
             show_menu(level, user_id)
+    else:
+        if pilihan == '0':
+            show_profile(level, user_id)
+        elif pilihan == '1':
+            kelola_rekomendasi_menu(level, user_id)
+        elif pilihan == '2':
+            kelola_rekomendasi_resep(level, user_id)
+        else:
+            print("Pilihan tidak valid.")
+            show_menu(level, user_id)
 
 def show_profile(level, user_id):
     try:
@@ -532,11 +542,9 @@ def visualisasi_konsumsi_kalori(level, user_id):
         df['user_id'] = df['user_id'].astype(int)
         df['tanggal'] = pd.to_datetime(df['tanggal'])
 
-        now = datetime(2025, 5, 26)  # waktu fiktif sesuai data uji coba
+        now = datetime.now()
         one_week_ago = now - timedelta(days=7)
 
-
-        # df_filtered = df[(df['user_id'] == user_id) & (df['tanggal'] >= one_week_ago)]
         df_filtered = df[(df['user_id'] == int(user_id)) & (df['tanggal'] >= one_week_ago)]
     
         if df_filtered.empty:
@@ -544,16 +552,13 @@ def visualisasi_konsumsi_kalori(level, user_id):
             show_menu(level, user_id)
             return
 
-        # Fungsi untuk menjumlahkan kalori dari string menu
         def extract_total_calories(menu_string):
             angka = re.findall(r'\((\d+)\)', menu_string)
             total = sum([int(kal) for kal in angka])
             return total
 
-        # Tambahkan kolom total kalori
         df_filtered['total_kalori'] = df_filtered['menu (kalori)'].apply(extract_total_calories)
 
-        # Kelompokkan per hari
         df_grouped = df_filtered.groupby(df_filtered['tanggal'].dt.date)['total_kalori'].sum()
 
         # Plot grafik
@@ -573,7 +578,248 @@ def visualisasi_konsumsi_kalori(level, user_id):
     except Exception as e:
         print(f"❌ Terjadi kesalahan: {e}")
     
-    show_menu(level, user_id)
+# Admin Role
+def kelola_rekomendasi_menu(level, user_id):
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("📋 === Kelola Rekomendasi Menu ===")
+        
+        # Cek apakah file ada
+        if not os.path.exists("menu.csv"):
+            print("⚠️  File menu.csv tidak ditemukan. Membuat file baru...")
+            df = pd.DataFrame(columns=["id", "makanan", "kalori"])
+            df.to_csv("menu.csv", index=False)
+        else:
+            df = pd.read_csv("menu.csv", usecols=["id", "makanan", "kalori"])
+
+        # Tampilkan daftar menu
+        if df.empty:
+            print("📭 Belum ada data menu yang tersedia.")
+        else:
+            print("\n📑 Daftar Menu:")
+            print(df.to_string(index=False))
+
+        print("\n✨ Pilihan:")
+        print("[1] ➕ Tambah Menu Baru")
+        print("[2] ✏️  Edit Menu yang Ada")
+        print("[3] 🗑️  Hapus Menu")
+        print("[0] 🔙 Kembali ke Menu Utama")
+
+        pilihan = input("Masukkan pilihan Anda: ")
+
+        if pilihan == "1":
+            tambah_menu(df)
+        elif pilihan == "2":
+            edit_menu(df)
+        elif pilihan == "3":
+            hapus_menu(df)
+        elif pilihan == "0":
+            print("🔙 Kembali ke Menu Admin...\n")
+            show_menu(level, user_id)
+        else:
+            print("❌ Pilihan tidak valid. Coba lagi.")
+            input("Tekan Enter untuk melanjutkan...")
+
+def tambah_menu(df):
+    print("\n📥 Tambah Menu Baru")
+    makanan = input("Masukkan nama makanan: ")
+    kalori = input("Masukkan jumlah kalori: ")
+
+    try:
+        kalori = int(kalori)
+        id_baru = df["id"].max() + 1 if not df.empty else 1
+        df.loc[len(df)] = [id_baru, makanan, kalori]
+        df.to_csv("menu.csv", index=False)
+        print("✅ Menu berhasil ditambahkan!")
+    except ValueError:
+        print("❌ Kalori harus berupa angka.")
+
+    input("Tekan Enter untuk kembali...")
+
+def edit_menu(df):
+    print("\n✏️ Edit Menu")
+    try:
+        id_edit_input = input("Masukkan ID menu yang ingin diedit: ")
+        if not id_edit_input.strip():
+            print("❌ ID tidak boleh kosong.")
+            input("Tekan Enter untuk kembali...")
+            return
+
+        id_edit = int(id_edit_input)
+        if id_edit in df["id"].values:
+            makanan_lama = df.loc[df["id"] == id_edit, "makanan"].values[0]
+            kalori_lama = df.loc[df["id"] == id_edit, "kalori"].values[0]
+
+            makanan_baru = input(f"Masukkan nama makanan baru (kosongkan untuk tetap '{makanan_lama}'): ")
+            kalori_input = input(f"Masukkan kalori baru (kosongkan untuk tetap '{kalori_lama}'): ")
+
+            makanan_final = makanan_baru.strip() if makanan_baru.strip() else makanan_lama
+            kalori_final = int(kalori_input) if kalori_input.strip() else kalori_lama
+
+            df.loc[df["id"] == id_edit, ["makanan", "kalori"]] = [makanan_final, kalori_final]
+            df.to_csv("menu.csv", index=False)
+            print("✅ Menu berhasil diperbarui!")
+        else:
+            print("❌ ID tidak ditemukan.")
+    except ValueError:
+        print("❌ Input tidak valid. Harus berupa angka.")
+    input("Tekan Enter untuk kembali...")
+
+def hapus_menu(df):
+    print("\n🗑️ Hapus Menu")
+    try:
+        id_hapus = int(input("Masukkan ID menu yang ingin dihapus: "))
+        if id_hapus in df["id"].values:
+            df = df[df["id"] != id_hapus]
+            df.to_csv("menu.csv", index=False)
+            print("🗑️ Menu berhasil dihapus.")
+        else:
+            print("❌ ID tidak ditemukan.")
+    except ValueError:
+        print("❌ Input tidak valid.")
+    input("Tekan Enter untuk kembali...")
+    
+def kelola_rekomendasi_resep(level, user_id):
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("📋 === Kelola Rekomendasi Resep ===")
+        
+        if not os.path.exists("resep.csv"):
+            print("⚠️  File resep.csv tidak ditemukan. Membuat file baru...")
+            df = pd.DataFrame(columns=["id", "nama makanan", "resep", "cara_masak", "kebutuhan"])
+            df.to_csv("resep.csv", index=False)
+        else:
+            df = pd.read_csv("resep.csv")
+
+        if df.empty:
+            print("📭 Belum ada data resep yang tersedia.")
+        else:
+            print("\n📑 Daftar Resep:")
+            for _, row in df.iterrows():
+                print(f"ID: {row['id']}")
+                print(f"Nama Makanan: {row['nama makanan']}")
+                print(f"Bahan-bahan: {row['resep']}")
+                # Tampilkan cara masak dengan split baris '\n'
+                print("Cara Masak:")
+                for line in str(row['cara_masak']).split('\\n'):
+                    print(f"  {line.strip()}")
+                print(f"Kebutuhan: {row['kebutuhan']}")
+                print("-" * 40)
+
+        print("\n✨ Pilihan:")
+        print("[1] ➕ Tambah Resep Baru")
+        print("[2] ✏️  Edit Resep yang Ada")
+        print("[3] 🗑️  Hapus Resep")
+        print("[0] 🔙 Kembali ke Menu Utama")
+
+        pilihan = input("Masukkan pilihan Anda: ")
+
+        if pilihan == "1":
+            tambah_resep(df)
+        elif pilihan == "2":
+            edit_resep(df)
+        elif pilihan == "3":
+            hapus_resep(df)
+        elif pilihan == "0":
+            print("🔙 Kembali ke Menu Admin...\n")
+            break
+        else:
+            print("❌ Pilihan tidak valid. Coba lagi.")
+            input("Tekan Enter untuk melanjutkan...")
+
+def tambah_resep(df):
+    print("\n📥 Tambah Resep Baru")
+    nama = input("Masukkan nama makanan: ")
+    resep = input("Masukkan bahan-bahan (pisahkan dengan koma): ")
+    
+    # Input cara masak baris per baris
+    print("Masukkan cara masak (satu per baris):")
+    cara_masak_list = []
+    while True:
+        step = input(f"  Langkah {len(cara_masak_list)+1}: ")
+        if step.strip() != "":
+            cara_masak_list.append(step.strip())
+        lanjut = input("Apakah lanjut? (y/n): ").lower()
+        if lanjut != 'y':
+            break
+    cara_masak = "\\n".join(cara_masak_list)
+
+    kebutuhan = ""
+    while kebutuhan not in ['normal', 'diet', 'bulking']:
+        kebutuhan = input("Masukkan kebutuhan (normal/diet/bulking): ").lower()
+    
+    id_baru = df["id"].max() + 1 if not df.empty else 1
+    df.loc[len(df)] = [id_baru, nama, resep, cara_masak, kebutuhan]
+    df.to_csv("resep.csv", index=False)
+    print("✅ Resep berhasil ditambahkan!")
+    input("Tekan Enter untuk kembali...")
+
+def edit_resep(df):
+    print("\n✏️ Edit Resep")
+    try:
+        id_edit_input = input("Masukkan ID resep yang ingin diedit: ")
+        if not id_edit_input.strip():
+            print("❌ ID tidak boleh kosong.")
+            input("Tekan Enter untuk kembali...")
+            return
+
+        id_edit = int(id_edit_input)
+        if id_edit in df["id"].values:
+            nama_lama = df.loc[df["id"] == id_edit, "nama makanan"].values[0]
+            resep_lama = df.loc[df["id"] == id_edit, "resep"].values[0]
+            cara_masak_lama = df.loc[df["id"] == id_edit, "cara_masak"].values[0]
+            kebutuhan_lama = df.loc[df["id"] == id_edit, "kebutuhan"].values[0]
+
+            nama_baru = input(f"Nama makanan baru (kosongkan untuk tetap '{nama_lama}'): ")
+            resep_baru = input(f"Bahan-bahan baru (kosongkan untuk tetap '{resep_lama}'): ")
+
+            print("Masukkan cara masak baru (kosongkan untuk tetap cara masak lama):")
+            cara_masak_list = []
+            while True:
+                step = input(f"  Langkah {len(cara_masak_list)+1}: ")
+                if step.strip() != "":
+                    cara_masak_list.append(step.strip())
+                else:
+                    if len(cara_masak_list) == 0:
+                        # Jika langsung kosong berarti pakai cara lama
+                        break
+                lanjut = input("Apakah lanjut? (y/n): ").lower()
+                if lanjut != 'y':
+                    break
+            if len(cara_masak_list) > 0:
+                cara_masak_baru = "\\n".join(cara_masak_list)
+            else:
+                cara_masak_baru = cara_masak_lama
+
+            kebutuhan_baru = input(f"Kebutuhan baru (normal/diet/bulking) (kosongkan untuk tetap '{kebutuhan_lama}'): ").lower()
+            if kebutuhan_baru not in ['normal', 'diet', 'bulking']:
+                kebutuhan_baru = kebutuhan_lama
+
+            nama_final = nama_baru if nama_baru.strip() else nama_lama
+            resep_final = resep_baru if resep_baru.strip() else resep_lama
+
+            df.loc[df["id"] == id_edit, ["nama makanan", "resep", "cara_masak", "kebutuhan"]] = [nama_final, resep_final, cara_masak_baru, kebutuhan_baru]
+            df.to_csv("resep.csv", index=False)
+            print("✅ Resep berhasil diperbarui!")
+        else:
+            print("❌ ID tidak ditemukan.")
+    except ValueError:
+        print("❌ Input tidak valid. Harus berupa angka.")
+    input("Tekan Enter untuk kembali...")
+
+def hapus_resep(df):
+    print("\n🗑️ Hapus Resep")
+    try:
+        id_hapus = int(input("Masukkan ID resep yang ingin dihapus: "))
+        if id_hapus in df["id"].values:
+            df = df[df["id"] != id_hapus]
+            df.to_csv("resep.csv", index=False)
+            print("🗑️ Resep berhasil dihapus.")
+        else:
+            print("❌ ID tidak ditemukan.")
+    except ValueError:
+        print("❌ Input tidak valid.")
+    input("Tekan Enter untuk kembali...")
     
 # Jalankan program
 if __name__ == "__main__":

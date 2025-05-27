@@ -1,6 +1,6 @@
 id,nama makanan,resep,cara_masak,kebutuhan
 1,Nasi Goreng (350),"Nasi, kecap, telur, bumbu","1. Tumis bumbu hingga harum.\n2. Masukkan telur, orak-arik.\n3. Tambahkan nasi, kecap, dan aduk rata.",normal
-2,Salad Sayur (200),"Selada, tomat, mentimun, saus rendah kalori","1. Cuci bersih semua sayuran.\n2. Potong kecil sesuai selera.\n3. Campurkan dengan saus rendah kalori.",diet
-3,Smoothie Pisang (180),"Pisang, susu almond, madu","1. Kupas pisang dan potong kecil.\n2. Masukkan semua bahan ke blender.\n3. Blender hingga halus.",diet
-4,Ayam Panggang (400),"Ayam, bumbu, oven","1. Lumuri ayam dengan bumbu.\n2. Diamkan 30 menit agar meresap.\n3. Panggang di oven 180°C selama 45 menit.",bulking
-5,Steak Daging (700),"Daging sapi, lada hitam, garam","1. Bumbui daging dengan garam dan lada.\n2. Panaskan pan dan masak daging hingga tingkat kematangan sesuai selera.",bulking
+2,Salad Sayur (200),"Selada, tomat, mentimun, saus rendah kalori",1. Cuci bersih semua sayuran.\n2. Potong kecil sesuai selera.\n3. Campurkan dengan saus rendah kalori.,diet
+3,Smoothie Pisang (180),"Pisang, susu almond, madu",1. Kupas pisang dan potong kecil.\n2. Masukkan semua bahan ke blender.\n3. Blender hingga halus.,diet
+4,Ayam Panggang (400),"Ayam, bumbu, oven",1. Lumuri ayam dengan bumbu.\n2. Diamkan 30 menit agar meresap.\n3. Panggang di oven 180°C selama 45 menit.,bulking
+5,ayam (200),"Daging sapi, lada hitam, garam",1. Bumbui daging dengan garam dan lada.\n2. Panaskan pan dan masak daging hingga tingkat kematangan sesuai selera.,bulking
