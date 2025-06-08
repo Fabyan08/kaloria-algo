@@ -2,11 +2,9 @@ import csv
 import hashlib
 import re
 import pandas as pd
-import os
 from datetime import datetime
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
-import re
 import os
 
 # FABYAN
@@ -153,8 +151,7 @@ def show_menu(level, user_id):
         else:
             print("Pilihan tidak valid.")
             show_menu(level, user_id)
-            
-
+    
 def show_profile(level, user_id):
     os.system('cls')
     try:
