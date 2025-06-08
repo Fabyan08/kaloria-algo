@@ -2,13 +2,14 @@ import csv
 import hashlib
 import re
 import pandas as pd
-import random
 import os
 from datetime import datetime
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import re
+import os
 
+# FABYAN
 def id_berikutnya(filename):
     try:
         with open(filename, mode="r") as file:
@@ -21,6 +22,7 @@ def id_berikutnya(filename):
     return 1
 
 def main_menu():
+    os.system('cls')
     print("\n=== Selamat Datang di Kaloria ===")
     print("[1] Registrasi")
     print("[2] Login")
@@ -39,6 +41,7 @@ def main_menu():
         main_menu()
 
 def register():
+    os.system('cls')
     print("=== Registrasi ===")
     
     try:
@@ -77,6 +80,7 @@ def is_valid_email(email):
     return re.match(r"[^@]+@[^@]+\.[^@]+", email)
 
 def login():
+    os.system('cls')
     print("=== Login ===")
     email = input("Masukkan Email: ").strip()
     password = input("Masukkan Password: ").strip()
@@ -105,6 +109,7 @@ def login():
     main_menu()
 
 def show_menu(level, user_id):
+    os.system('cls')
     print("\n=== Menu Utama ===")
     print("[0] Profil")
 
@@ -148,6 +153,7 @@ def show_menu(level, user_id):
             show_menu(level, user_id)
 
 def show_profile(level, user_id):
+    os.system('cls')
     try:
         with open('users.csv', 'r') as file:
             users = list(csv.reader(file))
@@ -206,6 +212,7 @@ def show_profile(level, user_id):
         print(f"Terjadi kesalahan: {e}")
 
 def hitung_menu(level, user_id):
+    os.system('cls')
     print("\n=== Hitung Menu ===")
     print("Ingin menginput menu secara:")
     print("[1] Manual")
@@ -219,8 +226,10 @@ def hitung_menu(level, user_id):
         hitung_otomatis(level, user_id)
     else:
         print("Pilihan tidak valid.")
-        
+     
+# NISA
 def hitung_manual(level, user_id):
+    os.system('cls')
     print("\n=== Mode Manual ===")
     print("Pilih tujuan konsumsi:")
     print("[1] Diet (maks 1000 kalori)")
@@ -287,11 +296,9 @@ def hitung_manual(level, user_id):
     else:
         print("⚠️  Menu melebihi target kalori.")
 
-        # 🧠 Tambahkan solusi knapsack jika melebihi batas
         n = len(makanan_list)
         W = batas_kalori
 
-        # Buat tabel DP
         dp = [[0] * (W + 1) for _ in range(n + 1)]
 
         for i in range(1, n + 1):
@@ -302,7 +309,6 @@ def hitung_manual(level, user_id):
                 else:
                     dp[i][w] = dp[i - 1][w]
 
-        # Traceback untuk mencari item yang dipilih
         w = W
         selected_items = []
         for i in range(n, 0, -1):
@@ -327,6 +333,7 @@ def hitung_manual(level, user_id):
             show_menu(level, user_id)
     
 def hitung_otomatis(level, user_id):
+    os.system('cls')
     print("\n=== Mode Otomatis ===")
     print("Pilih tujuan konsumsi:")
     print("[1] Diet")
@@ -376,7 +383,6 @@ def hitung_otomatis(level, user_id):
 
     print(f"\n✅ Total kalori: {total} / {batas_kalori}")
 
-    # Tawarkan simpan ke history
     simpan = input("\n💾 Apakah ingin menyimpan hasil ke history? (y/n): ")
     if simpan.lower() == 'y':
         simpan_ke_history(user_id, selected, target)
@@ -386,16 +392,12 @@ def hitung_otomatis(level, user_id):
     show_menu(level, user_id)
     
 def simpan_ke_history(user_id, makanan_list, kebutuhan):
-    import pandas as pd
-    import os
-    from datetime import datetime
+    os.system('cls')
 
     if os.path.exists("history.csv"):
         try:
             data_df = pd.read_csv("history.csv")
-            # Pastikan kolom 'id' ada
             if 'id' not in data_df.columns:
-                # Jika kolom 'id' tidak ada, beri nama kolom secara manual
                 data_df = pd.read_csv("history.csv", header=None)
                 data_df.columns = ["id", "user_id", "tanggal", "makanan dan kalori", "kebutuhan"]
         except Exception as e:
@@ -423,8 +425,7 @@ def simpan_ke_history(user_id, makanan_list, kebutuhan):
         df_baru.to_csv(f, header=f.tell() == 0, index=False)
         
 def history_konsumsi(level, user_id):
-    import pandas as pd
-    import os
+    os.system('cls')
 
     print("\n=== Riwayat Konsumsi Kalori ===")
     try:
@@ -445,14 +446,13 @@ def history_konsumsi(level, user_id):
                 print(f"🍽️  Menu: {row['menu (kalori)']}")
                 print(f"🎯 Kebutuhan: {row['kebutuhan']}")
 
-            # Tambahkan opsi untuk menghapus data
             hapus = input("\n🗑️ Apakah kamu ingin menghapus salah satu data? (y/n): ").lower()
             if hapus == 'y':
                 try:
                     id_hapus = int(input("Masukkan ID data yang ingin dihapus: "))
                     if id_hapus in user_history['id'].values:
-                        df = df[df['id'] != id_hapus]  # Hapus dari DataFrame asli
-                        df.to_csv("history.csv", index=False)  # Simpan ulang
+                        df = df[df['id'] != id_hapus] 
+                        df.to_csv("history.csv", index=False)
                         print("✅ Data berhasil dihapus.")
                     else:
                         print("❌ ID tidak ditemukan dalam riwayat kamu.")
@@ -466,6 +466,7 @@ def history_konsumsi(level, user_id):
     show_menu(level, user_id)
 
 def rekomendasi_resep(level, user_id):
+    os.system('cls')
     print("\n=== Rekomendasi Resep ===")
     try:
         df = pd.read_csv("resep.csv")
@@ -506,7 +507,6 @@ def rekomendasi_resep(level, user_id):
         if kebutuhan:
             filtered = filtered[filtered['kebutuhan'].str.lower() == kebutuhan.lower()]
 
-        # Ekstrak kalori dari nama makanan
         filtered['kalori'] = filtered['nama makanan'].str.extract(r"\((\d+)\)").astype(float)
         filtered = filtered[filtered['kalori'] <= max_kalori]
 
@@ -530,15 +530,13 @@ def rekomendasi_resep(level, user_id):
         print(f"❌ Terjadi kesalahan: {e}")
     show_menu(level, user_id)
     
-    
 def visualisasi_konsumsi_kalori(level, user_id):
+    os.system('cls')
     try:
         df = pd.read_csv("history.csv")
 
-        # Ubah kolom tanggal menjadi datetime
         df['tanggal'] = pd.to_datetime(df['tanggal'])
 
-        # Pastikan tipe data sesuai
         df['user_id'] = df['user_id'].astype(int)
         df['tanggal'] = pd.to_datetime(df['tanggal'])
 
@@ -578,13 +576,14 @@ def visualisasi_konsumsi_kalori(level, user_id):
     except Exception as e:
         print(f"❌ Terjadi kesalahan: {e}")
     
+# WINSA
 # Admin Role
 def kelola_rekomendasi_menu(level, user_id):
+    os.system('cls')
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
         print("📋 === Kelola Rekomendasi Menu ===")
         
-        # Cek apakah file ada
         if not os.path.exists("menu.csv"):
             print("⚠️  File menu.csv tidak ditemukan. Membuat file baru...")
             df = pd.DataFrame(columns=["id", "makanan", "kalori"])
@@ -592,7 +591,6 @@ def kelola_rekomendasi_menu(level, user_id):
         else:
             df = pd.read_csv("menu.csv", usecols=["id", "makanan", "kalori"])
 
-        # Tampilkan daftar menu
         if df.empty:
             print("📭 Belum ada data menu yang tersedia.")
         else:
@@ -621,6 +619,7 @@ def kelola_rekomendasi_menu(level, user_id):
             input("Tekan Enter untuk melanjutkan...")
 
 def tambah_menu(df):
+    os.system('cls')
     print("\n📥 Tambah Menu Baru")
     makanan = input("Masukkan nama makanan: ")
     kalori = input("Masukkan jumlah kalori: ")
@@ -637,6 +636,7 @@ def tambah_menu(df):
     input("Tekan Enter untuk kembali...")
 
 def edit_menu(df):
+    os.system('cls')
     print("\n✏️ Edit Menu")
     try:
         id_edit_input = input("Masukkan ID menu yang ingin diedit: ")
@@ -666,6 +666,7 @@ def edit_menu(df):
     input("Tekan Enter untuk kembali...")
 
 def hapus_menu(df):
+    os.system('cls')
     print("\n🗑️ Hapus Menu")
     try:
         id_hapus = int(input("Masukkan ID menu yang ingin dihapus: "))
@@ -680,6 +681,7 @@ def hapus_menu(df):
     input("Tekan Enter untuk kembali...")
     
 def kelola_rekomendasi_resep(level, user_id):
+    os.system('cls')
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
         print("📋 === Kelola Rekomendasi Resep ===")
@@ -699,7 +701,6 @@ def kelola_rekomendasi_resep(level, user_id):
                 print(f"ID: {row['id']}")
                 print(f"Nama Makanan: {row['nama makanan']}")
                 print(f"Bahan-bahan: {row['resep']}")
-                # Tampilkan cara masak dengan split baris '\n'
                 print("Cara Masak:")
                 for line in str(row['cara_masak']).split('\\n'):
                     print(f"  {line.strip()}")
@@ -728,11 +729,11 @@ def kelola_rekomendasi_resep(level, user_id):
             input("Tekan Enter untuk melanjutkan...")
 
 def tambah_resep(df):
+    os.system('cls')
     print("\n📥 Tambah Resep Baru")
     nama = input("Masukkan nama makanan: ")
     resep = input("Masukkan bahan-bahan (pisahkan dengan koma): ")
     
-    # Input cara masak baris per baris
     print("Masukkan cara masak (satu per baris):")
     cara_masak_list = []
     while True:
@@ -755,6 +756,7 @@ def tambah_resep(df):
     input("Tekan Enter untuk kembali...")
 
 def edit_resep(df):
+    os.system('cls')
     print("\n✏️ Edit Resep")
     try:
         id_edit_input = input("Masukkan ID resep yang ingin diedit: ")
@@ -781,7 +783,6 @@ def edit_resep(df):
                     cara_masak_list.append(step.strip())
                 else:
                     if len(cara_masak_list) == 0:
-                        # Jika langsung kosong berarti pakai cara lama
                         break
                 lanjut = input("Apakah lanjut? (y/n): ").lower()
                 if lanjut != 'y':
@@ -808,6 +809,7 @@ def edit_resep(df):
     input("Tekan Enter untuk kembali...")
 
 def hapus_resep(df):
+    os.system('cls')
     print("\n🗑️ Hapus Resep")
     try:
         id_hapus = int(input("Masukkan ID resep yang ingin dihapus: "))
@@ -821,6 +823,5 @@ def hapus_resep(df):
         print("❌ Input tidak valid.")
     input("Tekan Enter untuk kembali...")
     
-# Jalankan program
 if __name__ == "__main__":
     main_menu()
