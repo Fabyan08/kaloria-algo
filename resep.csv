@@ -4,3 +4,19 @@ id,nama makanan,resep,cara_masak,kebutuhan
 3,Smoothie Pisang (180),"Pisang, susu almond, madu",1. Kupas pisang dan potong kecil.\n2. Masukkan semua bahan ke blender.\n3. Blender hingga halus.,diet
 4,Ayam Panggang (400),"Ayam, bumbu, oven",1. Lumuri ayam dengan bumbu.\n2. Diamkan 30 menit agar meresap.\n3. Panggang di oven 180°C selama 45 menit.,bulking
 5,ayam (200),"Daging sapi, lada hitam, garam",1. Bumbui daging dengan garam dan lada.\n2. Panaskan pan dan masak daging hingga tingkat kematangan sesuai selera.,bulking
+6,Oatmeal Buah (250),"Oat, susu rendah lemak, pisang, stroberi","1. Rebus oat dengan susu.\n2. Tambahkan potongan buah.\n3. Sajikan hangat.",diet
+7,Sup Ayam (300),"Ayam, wortel, kentang, bawang, seledri","1. Rebus ayam hingga empuk.\n2. Masukkan sayuran dan bumbu.\n3. Masak hingga matang.",normal
+8,Tahu Tempe Bacem (350),"Tahu, tempe, gula merah, bawang, air kelapa","1. Rebus semua bahan hingga meresap.\n2. Goreng hingga kecoklatan.",normal
+9,Smoothie Hijau (170),"Bayam, apel, lemon, air, madu","1. Campur semua bahan ke dalam blender.\n2. Blender hingga halus dan sajikan dingin.",diet
+10,Telur Dadar Bayam (280),"Telur, bayam, bawang, garam","1. Tumis bayam dan bawang.\n2. Kocok telur, campur dengan bayam.\n3. Goreng hingga matang.",diet
+11,Spaghetti Tuna (420),"Spaghetti, tuna, bawang putih, saus tomat","1. Rebus spaghetti.\n2. Tumis bawang dan tuna.\n3. Campur dengan saus tomat dan spaghetti.",bulking
+12,Tempe Orek (330),"Tempe, kecap manis, bawang putih, cabai","1. Goreng tempe.\n2. Tumis bumbu, tambahkan kecap.\n3. Campur dengan tempe dan aduk rata.",normal
+13,Capcay Kuah (300),"Aneka sayur, ayam/udang, bawang, saus tiram","1. Tumis bawang.\n2. Tambahkan sayuran dan protein.\n3. Tambahkan air dan saus, masak hingga matang.",normal
+14,Bubur Ayam (320),"Beras, ayam, kaldu, bawang, seledri","1. Rebus beras hingga menjadi bubur.\n2. Tambahkan suwiran ayam dan bumbu.\n3. Sajikan hangat.",normal
+15,Roti Gandum Telur (310),"Roti gandum, telur, tomat, keju","1. Panggang roti dan masak telur mata sapi.\n2. Sajikan dengan irisan tomat dan keju.",diet
+16,Pepes Ikan (370),"Ikan, daun pisang, bumbu halus","1. Lumuri ikan dengan bumbu.\n2. Bungkus dengan daun pisang.\n3. Kukus hingga matang.",diet
+17,Onigiri Isi Ayam (400),"Nasi, ayam cincang, nori, saus","1. Masak ayam dengan bumbu.\n2. Bentuk nasi dengan isian ayam di dalam.\n3. Bungkus dengan nori.",bulking
+18,Telur Rebus Alpukat (290),"Telur, alpukat, garam, merica","1. Rebus telur hingga matang.\n2. Sajikan dengan potongan alpukat dan bumbu.",diet
+19,Nasi Uduk Ayam (450),"Nasi, santan, ayam goreng, sambal","1. Masak nasi dengan santan dan rempah.\n2. Goreng ayam.\n3. Sajikan dengan sambal.",bulking
+20,Kentang Panggang Keju (380),"Kentang, keju, bawang putih, minyak zaitun","1. Panggang kentang dengan bumbu.\n2. Tambahkan keju dan panggang kembali.",bulking
+21,Gado-Gado (350),"Sayur rebus, tahu, tempe, telur, bumbu kacang","1. Rebus sayuran.\n2. Tata semua bahan.\n3. Siram dengan bumbu kacang.",normal

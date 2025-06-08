@@ -99,6 +99,7 @@ def login():
                 if row[2] == email and row[3] == password_hash:
                     print(f"Login berhasil! Selamat datang, {row[1]}")
                     show_menu(row[5], row[0])
+                    os.system ('cls')
                     return
     except FileNotFoundError:
         print("Belum ada data pengguna. Silakan registrasi.")
@@ -106,6 +107,7 @@ def login():
         print(f"Terjadi kesalahan: {e}")
 
     print("Email atau password salah. Coba lagi.")
+    os.system ('cls')
     main_menu()
 
 def show_menu(level, user_id):
@@ -151,6 +153,7 @@ def show_menu(level, user_id):
         else:
             print("Pilihan tidak valid.")
             show_menu(level, user_id)
+            
 
 def show_profile(level, user_id):
     os.system('cls')
@@ -217,6 +220,7 @@ def hitung_menu(level, user_id):
     print("Ingin menginput menu secara:")
     print("[1] Manual")
     print("[2] Otomatis")
+    print("[3] Kembali")
 
     pilihan = input("Pilih metode: ")
 
@@ -224,6 +228,8 @@ def hitung_menu(level, user_id):
         hitung_manual(level, user_id)
     elif pilihan == "2":
         hitung_otomatis(level, user_id)
+    elif pilihan == "3":
+        show_menu(level, user_id)
     else:
         print("Pilihan tidak valid.")
      
@@ -256,6 +262,7 @@ def hitung_manual(level, user_id):
         return
 
     def input_manual_menu():
+        os.system ('cls')
         print("\n=== Input Menu Manual ===")
         print("Masukkan daftar makanan dan jumlah kalorinya.")
         print("Ketik 'n' jika sudah selesai.\n")
@@ -350,10 +357,13 @@ def hitung_otomatis(level, user_id):
         return
 
     if pilihan == "1":
+        os.system ('cls')
         target = "diet"
     elif pilihan == "2":
+        os.system ('cls')
         target = "normal"
     elif pilihan == "3":
+        os.system ('cls')
         target = "bulking"
     else:
         print("Pilihan tidak valid.")
@@ -476,6 +486,7 @@ def rekomendasi_resep(level, user_id):
         print("2. Bulking (maks 2500 kalori)")
         print("3. Normal (maks 1800 kalori)")
         print("4. Input batas kalori sendiri")
+        print("5. Kembali")
 
         pilihan = input("Masukkan pilihan (1-4): ")
 
@@ -493,6 +504,8 @@ def rekomendasi_resep(level, user_id):
             max_kalori = 1800
         elif pilihan == '4':
             kebutuhan = None
+        elif pilihan == '5':
+            show_menu(level, user_id)
             try:
                 max_kalori = int(input("Masukkan batas maksimal kalori: "))
             except ValueError:
