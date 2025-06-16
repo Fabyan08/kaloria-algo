@@ -47,7 +47,6 @@ def register():
         users_df.columns = ["user_id", "nama", "email", "password", "nomor_hp", "level"]
     except FileNotFoundError:
         users_df = pd.DataFrame(columns=["user_id", "nama", "email", "password", "nomor_hp", "level"])
-
     
     user_id = 1 if users_df.empty else users_df["user_id"].max() + 1
 
@@ -96,7 +95,7 @@ def login():
             for row in reader:
                 if row[2] == email and row[3] == password_hash:
                     print(f"Login berhasil! Selamat datang, {row[1]}")
-                    show_menu(row[5], row[0])
+                    show_menu(row[5], row[0])   
                     os.system ('cls')
                     return
     except FileNotFoundError:
@@ -297,6 +296,8 @@ def hitung_manual(level, user_id):
 
     if total_kalori <= batas_kalori:
         print("✅ Menu sesuai dengan target kalori.")
+        input("Tekan Enter untuk melanjutkan...")
+        show_menu(level, user_id)
     else:
         print("⚠️  Menu melebihi target kalori.")
 
@@ -311,7 +312,7 @@ def hitung_manual(level, user_id):
                 if kal <= w:
                     dp[i][w] = max(dp[i - 1][w], dp[i - 1][w - kal] + kal)
                 else:
-                    dp[i][w] = dp[i - 1][w]
+                    dp[i][w] = dp[i - 1][w] 
 
         w = W
         selected_items = []
@@ -331,10 +332,13 @@ def hitung_manual(level, user_id):
             kebutuhan = "manual"
             simpan_ke_history(user_id, makanan_list, kebutuhan)
             print("✅ Disimpan ke history.csv")
+            input("Tekan Enter untuk melanjutkan...")
             show_menu(level, user_id)
         else:
             print("❌ Tidak disimpan.")
+            input("Tekan Enter untuk melanjutkan...")
             show_menu(level, user_id)
+            
     
 def hitung_otomatis(level, user_id):
     os.system('cls')
@@ -346,64 +350,44 @@ def hitung_otomatis(level, user_id):
 
     pilihan = input("Pilihan: ")
 
+    try:
+        kalori_df = pd.read_csv("kalori.csv")
+        menu_df = pd.read_csv("menu.csv")
+    except:
+        print("❌ Gagal membaca file kalori.csv atau menu.csv")
+        return
+
     if pilihan == "1":
-        os.system('cls')
+        os.system ('cls')
         target = "diet"
     elif pilihan == "2":
-        os.system('cls')
+        os.system ('cls')
         target = "normal"
     elif pilihan == "3":
-        os.system('cls')
+        os.system ('cls')
         target = "bulking"
     else:
-        print("❌ Pilihan tidak valid.")
+        print("Pilihan tidak valid.")
         return
 
-    batas_kalori = None
-    try:
-        with open("kalori.csv", "r") as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                if row['jenis'].lower() == target:
-                    batas_kalori = int(row['jumlah maks kalori'])
-                    break
-    except:
-        print("❌ Gagal membaca file kalori.csv")
+    batas = kalori_df[kalori_df['jenis'] == target]['jumlah maks kalori'].values
+    if len(batas) == 0:
+        print("❌ Tidak ditemukan data kalori untuk kategori tersebut.")
         return
 
-    if batas_kalori is None:
-        print("❌ Data kalori untuk kategori tersebut tidak ditemukan.")
-        return
-
+    batas_kalori = batas[0]
     print(f"\nTarget Kalori Maksimum: {batas_kalori} kkal")
 
-    menu = []
-    try:
-        with open("menu.csv", "r") as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                try:
-                    menu.append({
-                        "makanan": row["makanan"],
-                        "kalori": int(row["kalori"])
-                    })
-                except:
-                    continue
-    except:
-        print("❌ Gagal membaca file menu.csv")
-        return
-
-    menu.sort(key=lambda x: x["kalori"], reverse=True)
+    menu_df_sorted = menu_df.sort_values(by='kalori', ascending=False)
 
     selected = []
     total = 0
 
-    for item in menu:
-        if total + item["kalori"] <= batas_kalori:
-            selected.append(item)
-            total += item["kalori"]
+    for _, row in menu_df_sorted.iterrows():
+        if total + row['kalori'] <= batas_kalori:
+            selected.append({"makanan": row['makanan'], "kalori": row['kalori']})
+            total += row['kalori']
 
-    # Tampilkan hasil
     print("\n📋 Menu Rekomendasi Berdasarkan Knapsack Greedy:")
     for item in selected:
         print(f"- {item['makanan']} ({item['kalori']} kkal)")
@@ -414,12 +398,10 @@ def hitung_otomatis(level, user_id):
     if simpan.lower() == 'y':
         simpan_ke_history(user_id, selected, target)
         print("✅ Disimpan ke history.csv")
-        input("\nTekan Enter untuk melanjutkan...")
     else:
         print("❌ Tidak disimpan.")
-
     show_menu(level, user_id)
-
+    
 def simpan_ke_history(user_id, makanan_list, kebutuhan):
     os.system('cls')
 
@@ -544,6 +526,8 @@ def rekomendasi_resep(level, user_id):
 
         if filtered.empty:
             print("❌ Tidak ada resep yang cocok.")
+            input("Tekan Enter untuk kembali...")
+            show_menu(level, user_id)
         else:
             resep_terpilih = filtered.sample(n=1).iloc[0]
             print("\n🎉 Resep Rekomendasi:")
@@ -553,6 +537,8 @@ def rekomendasi_resep(level, user_id):
             print(resep_terpilih['cara_masak'].replace("\\n", "\n"))
             print(f"🎯 Kebutuhan: {resep_terpilih['kebutuhan']}")
             print(f"🔥 Kalori: {int(resep_terpilih['kalori'])} kalori")
+            input("Tekan Enter untuk kembali...")
+            show_menu(level, user_id)
 
     except FileNotFoundError:
         print("❌ File resep.csv tidak ditemukan.")
@@ -570,7 +556,6 @@ def visualisasi_konsumsi_kalori(level, user_id):
         df['tanggal'] = pd.to_datetime(df['tanggal'])
 
         df['user_id'] = df['user_id'].astype(int)
-        df['tanggal'] = pd.to_datetime(df['tanggal'])
 
         now = datetime.now()
         one_week_ago = now - timedelta(days=7)
@@ -602,6 +587,7 @@ def visualisasi_konsumsi_kalori(level, user_id):
         plt.grid(axis='y', linestyle='--', alpha=0.7)
         plt.savefig("grafik_kalori.png")
         plt.show()
+        show_menu(level, user_id)
 
     except FileNotFoundError:
         print("❌ File history.csv tidak ditemukan.")

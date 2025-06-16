@@ -1,8 +1,8 @@
-id,makanan,kalori
-1,Nasi Goreng,350
-2,Ayam Panggang,250
-3,Tahu Tempe,200
-4,Sup Sayur,150
-5,Oatmeal,180
-6,Telur Rebus,100
-7,Sirup,100
+id,makanan,kalori,gizi
+1,Nasi Goreng,350,karbohidrat
+2,Ayam Panggang,250,protein
+3,Tahu Tempe,200,protein
+4,Sup Sayur,150,serat
+5,Oatmeal,180,karbohidrat
+6,Telur Rebus,100,protein
+7,Sirup,100,gula
